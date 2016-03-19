@@ -1,0 +1,34 @@
+﻿@model IEnumerable<KanbanProjectMvc.Models.BoardColumn>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Index</h2>
+
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.ColumnName)
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @*@Html.ActionLink(item.ColumnName, "Edit", "BoardColumns", new { columnId = item.BoardColumnId }, null)*@
+            @Html.DisplayFor(modelItem => item.ColumnName)
+        </td>
+        <td>
+            @Html.ActionLink("Edit", "Edit", new { id=item.BoardColumnId }) |
+            @Html.ActionLink("Details", "Details", new { id=item.BoardColumnId }) |
+            @Html.ActionLink("Delete", "Delete", new { id=item.BoardColumnId })
+        </td>
+    </tr>
+}
+
+</table>

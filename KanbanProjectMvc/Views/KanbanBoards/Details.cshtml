@@ -1,0 +1,74 @@
+﻿@model KanbanProjectMvc.Models.KanbanBoard
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>@Model.BoardName</h2>
+<style>
+    table, th, td {
+        border: 1px solid black;
+        padding: 5px;
+    }
+
+    table { border-spacing: 15px; }
+</style>
+<script language="javascript" type="text/javascript">
+    $(document).ready(function() {
+
+        for (var i = 0; i < @(Model.Columns.Count); i++) {
+            $('#droppableColumns' + i + ' img').css({ 'z-index': 10 }).draggable({
+                'opacity': '0.5',
+                'revert': true,
+                'cursor': 'pointer'
+            });
+        }
+
+        for (var i = 0; i < @(Model.Columns.Count); i++) {
+
+            $('#droppableColumns' + i).droppable({
+                drop: function(event, ui) {
+                    var stickerId = $(ui.draggable).siblings('.stickerId').val();
+                    var droppableId = $(this).attr("att");
+                    $.ajax({
+                        type: 'POST',
+                        url: '/BoardStickers/MoveSticker/',
+                        data: {
+                            id: stickerId,
+                            toColumnId: droppableId,
+                            boardId: @Model.KanbanBoardId,
+                        },
+                        success: function(data) {
+                            location.reload();
+                        }
+                    });
+                }
+            });
+        }
+    });
+</script>
+
+
+@Html.ActionLink("Add column", "Create", "BoardColumns", new {boardId = Model.KanbanBoardId}, null)
+<table >
+    @for (var i = 0; i < Model.Columns.Count; i++)
+    {
+        <tr>
+            <th>@Model.Columns.ToList()[i].ColumnName</th>
+        </tr>
+        <tr id="droppableColumns@(i)" att="@Model.Columns.ToList()[i].BoardColumnId" style="height: 50px; width: 100px;">
+            @foreach (var sticker in @Model.Columns.ToList()[i].Stickers)
+            {
+                <td>
+                    <div>
+                        <img alt="@sticker.StickerName">
+                        <input type="hidden" class="stickerId" value="@sticker.BoardStickerId"/>
+                        @Html.ActionLink("Delete", "Delete", "BoardStickers", new {id = sticker.BoardStickerId}, null)
+                    </div>
+                </td>
+            }
+            <td>@Html.ActionLink("Add sticker", "Create", "BoardStickers", new { columnId = Model.Columns.ToList()[i].BoardColumnId, boardId = Model.KanbanBoardId }, null)</td>
+        </tr>
+        
+    }
+</table>
